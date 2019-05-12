@@ -115,16 +115,25 @@ public class IRC implements Runnable {
     return (String) this.messages.take();
   }
 
+  private void pong(String key) {
+    this.send(MessageFormat.format("PONG :{0}", key));
+  }
+
   public void run() {
     while (this.shouldRun) {
       String message = this.read();
       if (message == null)
         continue;
 
-      try {
-        this.messages.put(message);
-      } catch (InterruptedException exception) {
-        Log.debug("The message queue is full, dropping message");
+      if (message.indexOf("PING") == 0) {
+        String key = message.split(" ")[1];
+        this.pong(key);
+      } else {
+        try {
+          this.messages.put(message);
+        } catch (InterruptedException exception) {
+          Log.debug("The message queue is full, dropping message");
+        }
       }
     }
   }
