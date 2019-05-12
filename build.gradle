@@ -21,6 +21,10 @@ dependencies {
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
   // Extension to SpotBugs to spot security bugs
   spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.9.0'
+  // Apache URL building and more
+  compile 'org.apache.httpcomponents:httpclient:4.5.6'
+  // Dependency for JSON
+  compile 'org.json:json:20180813'
 }
 
 sourceSets {

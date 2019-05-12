@@ -10,6 +10,7 @@ import java.util.Map;
 * The main application.
 */
 public class App {
+  static Translator translator;
 
   /**
   * The main entrypoint of the app.
@@ -23,10 +24,19 @@ public class App {
     String nick = env.getOrDefault("IRC_NICK", "ruski-bot");
     String user = env.getOrDefault("IRC_USER", "ruski-bot");
     String gecos = env.getOrDefault("IRC_GECOS", "Emoji Ruski v0.0.1 (github.com/AlexGustafsson/irc-ruski-bot)");
+    String yandexTranslateKey = env.getOrDefault("YANDEX_TRANSLATE_API_KEY", null);
 
     if (server == null) {
       Log.error("Cannot start the bot without a given server");
+      System.exit(1);
     }
+
+    if (yandexTranslateKey == null) {
+      Log.error("Cannot start the bot without a free Yandex Translate API key");
+      System.exit(1);
+    }
+
+    translator = new Translator(yandexTranslateKey);
 
     IRC client = new IRC();
     try {
@@ -50,7 +60,8 @@ public class App {
         if (message.body.equals(MessageFormat.format("{0}: help", nick))) {
           handleHelp(client, channel, nick);
         } else if (message.body.indexOf(MessageFormat.format("{0}: ", nick)) == 0) {
-          handleTranslation(client, channel, message.body);
+          String body = message.body.substring(nick.length() + 2);
+          handleTranslation(client, channel, body);
         }
       } catch (InterruptedException exception) {
 
@@ -66,6 +77,13 @@ public class App {
   }
 
   private static void handleTranslation(IRC client, String channel, String body) {
-    client.send(channel, body);
+    try {
+      String translation = translator.translate(body, "ru");
+      if (translation != null) {
+        client.send(channel, translation);
+      }
+    } catch (Exception exception) {
+
+    }
   }
 }
