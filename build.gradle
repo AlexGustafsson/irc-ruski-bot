@@ -3,6 +3,12 @@ plugins {
   id 'java'
   // Plugin for supporting Java console applications
   id 'application'
+  // Plugin adding syntax checking / code style checking
+  id 'checkstyle'
+  // Plugin to detect bug patterns
+  id 'com.github.spotbugs' version '1.6.5'
+  // Plugin to check for issues with dependencies
+  id 'org.owasp.dependencycheck' version '4.0.0.1'
 }
 
 repositories {
@@ -13,6 +19,8 @@ dependencies {
   // JUnit - used for unit tests
   testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
+  // Extension to SpotBugs to spot security bugs
+  spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.8.0'
 }
 
 sourceSets {
@@ -57,6 +65,38 @@ test {
   testLogging {
     // Show stdout
     showStandardStreams = true
+  }
+}
+
+checkstyle {
+  // Configure checkstyle to use the latest version
+	toolVersion "8.15"
+  // Configure path to checkstyle config
+  configFile = project(':').file('config/checkstyle/checkstyle.xml')
+  // Define variable suppressions to point to the path of the suppressions file
+	configProperties = [ "suppressions" : project(':').file('config/checkstyle/suppressions.xml')]
+}
+
+spotbugs {
+  // Configure SpotBugs to use the latest version
+  toolVersion = '3.1.9'
+  effort = "max"
+  reportLevel = "low"
+  ignoreFailures = true
+  // Temporary exclude of a particular bug pattern
+  excludeFilter = file("config/spotbugs/excludes.xml")
+}
+
+// Configure DependecyCheck to use a suppression file
+dependencyCheck {
+	suppressionFile = file("config/dependency-check/suppressions.xml")
+}
+
+// Configure SpotBugs to report as HTML
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
+  reports {
+    xml.enabled = false
+    html.enabled = true
   }
 }
 

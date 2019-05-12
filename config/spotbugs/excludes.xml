@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <FindBugsFilter
+             xmlns="https://github.com/spotbugs/filter/3.0.0"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://github.com/spotbugs/filter/3.0.0 https://raw.githubusercontent.com/spotbugs/spotbugs/3.1.0/spotbugs/etc/findbugsfilter.xsd">
+ <!-- Temporarily pass an URL construction bug, see
+https://github.com/spotbugs/spotbugs/issues/724
+ -->
+  <Match>
+    <Class name="se.dequeue.waluigi.Nortic" />
+    <Bug pattern="URLCONNECTION_SSRF_FD" />
+  </Match>
+  <!-- Disable check for setAccessible(true) needed to be in a doPrivileged block.
+  We do this to be able to write concise tests where safety is not a real issue - testability is.-->
+  <Match>
+    <Source name="~.*Test\.java" />
+    <Bug pattern="DP_DO_INSIDE_DO_PRIVILEGED" />
+  </Match>
+</FindBugsFilter>

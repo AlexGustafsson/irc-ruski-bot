@@ -50,6 +50,25 @@ Any contribution is welcome. If you're not able to code it yourself, perhaps som
 # Clone the repository
 git clone https://github.com/AlexGustafsson/irc-ruski-bot && cd irc-ruski-bot
 
+##
+# Using Gradle
+
+# If you're on a Windows PC, you may have to use ./gradlew.bat instead.
+
+# --rerun-tasks ignore if the source code has seen no changes
+# it ensures that you get the full result
+
+# Run all checks and tests on the project
+./gradlew check
+# Test the project
+./gradlew test
+# Check code style
+./gradlew --rerun-tasks checkstyleMain checkstyleTest
+# Check for common bugs
+./gradlew --rerun-tasks spotbugsMain spotbugsTest
+# Check for dependency issues
+./gradlew --rerun-tasks dependencyCheckAnalyze
+
 # Compile and package the project
 ./gradlew assemble
 # Compile, test and package the project
