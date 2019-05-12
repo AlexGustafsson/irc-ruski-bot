@@ -1,0 +1,77 @@
+plugins {
+  // Plugin for supporting Java
+  id 'java'
+  // Plugin for supporting Java console applications
+  id 'application'
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  // JUnit - used for unit tests
+  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
+  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
+}
+
+sourceSets {
+  // The main java code lies in src
+  main {
+    java {
+      srcDir 'src/'
+    }
+    resources {
+      // Resources (static content) is found in resources, exclude build maps and shell scripts
+      srcDir 'resources/'
+      excludes = ['**/*.map', '**/*.sh']
+    }
+  }
+  test {
+    java {
+      srcDirs = ['test/']
+    }
+  }
+}
+
+// Specify configuration for testing
+test {
+  // Use JUnit5
+  useJUnitPlatform()
+  testLogging {
+    // Only show these events
+    events 'PASSED', 'FAILED', 'SKIPPED'
+    // Log everything when a test fails (such as expected outcome)
+    exceptionFormat = 'full'
+  }
+  // Print statistics after teting
+  afterSuite { desc, result ->
+    if (!desc.parent) {
+      println "\nTest result: ${result.resultType}"
+      println "Test summary: ${result.testCount} tests, " +
+        "${result.successfulTestCount} succeeded, " +
+        "${result.failedTestCount} failed, " +
+        "${result.skippedTestCount} skipped"
+    }
+  }
+  testLogging {
+    // Show stdout
+    showStandardStreams = true
+  }
+}
+
+// Configure compiler arguments to show deprecation warnings
+allprojects {
+  gradle.projectsEvaluated {
+    tasks.withType(JavaCompile) {
+      options.compilerArgs << "-Xlint:deprecation"
+    }
+  }
+}
+
+mainClassName = 'se.axgn.irc_ruski_bot.App'
+description = 'Ruski Bot v0.0.1 (github.com/AlexGustafsson/irc-ruski-bot)'
+sourceCompatibility = '1.9'
+targetCompatibility = '1.9'
+// The version is specified using the semantic versioning system
+version = '0.0.1'
