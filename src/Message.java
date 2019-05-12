@@ -1,8 +1,14 @@
 package se.axgn.ircruskibot;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
 * A message retrieved from the IRC server.
 */
+@SuppressFBWarnings(
+    value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD",
+    justification = "This class is used as a simple struct."
+)
 public class Message {
   /** The username of the message author. */
   public String sender;

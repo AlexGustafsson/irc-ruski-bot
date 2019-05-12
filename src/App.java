@@ -17,14 +17,14 @@ public class App {
   * @param args Command line parameters given to the app.
   */
   public static void main(String[] args) {
-    Map<String, String> env = System.getenv();
-    String server = env.getOrDefault("IRC_SERVER", null);
-    int port = Integer.parseInt(env.getOrDefault("IRC_PORT", "6697"));
-    String channel = env.getOrDefault("IRC_CHANNEL", "#random");
-    String nick = env.getOrDefault("IRC_NICK", "ruski-bot");
-    String user = env.getOrDefault("IRC_USER", "ruski-bot");
-    String gecos = env.getOrDefault("IRC_GECOS", "Emoji Ruski v0.0.1 (github.com/AlexGustafsson/irc-ruski-bot)");
-    String yandexTranslateKey = env.getOrDefault("YANDEX_TRANSLATE_API_KEY", null);
+    final Map<String, String> env = System.getenv();
+    final String server = env.getOrDefault("IRC_SERVER", null);
+    final int port = Integer.parseInt(env.getOrDefault("IRC_PORT", "6697"));
+    final String channel = env.getOrDefault("IRC_CHANNEL", "#random");
+    final String nick = env.getOrDefault("IRC_NICK", "ruski-bot");
+    final String user = env.getOrDefault("IRC_USER", "ruski-bot");
+    final String gecos = env.getOrDefault("IRC_GECOS", "Emoji Ruski v0.0.1 (github.com/AlexGustafsson/irc-ruski-bot)");
+    final String yandexTranslateKey = env.getOrDefault("YANDEX_TRANSLATE_API_KEY", null);
 
     if (server == null) {
       Log.error("Cannot start the bot without a given server");
@@ -64,7 +64,7 @@ public class App {
           handleTranslation(client, channel, body);
         }
       } catch (InterruptedException exception) {
-
+        Log.debug("Interrupted during message retrieval", exception);
       }
     }
   }
@@ -83,7 +83,7 @@ public class App {
         client.send(channel, translation);
       }
     } catch (Exception exception) {
-
+      Log.debug("Could not translate message", exception);
     }
   }
 }

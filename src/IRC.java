@@ -1,5 +1,7 @@
 package se.axgn.ircruskibot;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -7,8 +9,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
+import java.nio.charset.StandardCharsets;
 
 import java.text.MessageFormat;
 
@@ -16,15 +17,18 @@ import java.util.Arrays;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+
 /**
 * An IRC connector.
 */
 public class IRC implements Runnable {
-  SSLSocket socket;
-  PrintWriter outputWriter;
-  BufferedReader inputReader;
+  SSLSocket socket = null;
+  PrintWriter out = null;
+  BufferedReader in = null;
   BlockingQueue messages = new ArrayBlockingQueue<Message>(1024);
-  volatile boolean shouldRun;
+  volatile boolean shouldRun = false;
 
   /**
   * Instantiate an IRC client.
@@ -41,17 +45,21 @@ public class IRC implements Runnable {
   * @param nick The nickname to use.
   * @param gecos The realname (description) of the bot.
   */
+  @SuppressFBWarnings(
+      value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
+      justification = "SSLSocketFactory.createSocket() never returns null."
+  )
   public void connect(String server, int port, String user, String nick, String gecos) throws IOException {
     SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
     this.socket = (SSLSocket) factory.createSocket(server, port);
     this.socket.startHandshake();
 
-    OutputStreamWriter outputStreamWriter = new OutputStreamWriter(this.socket.getOutputStream());
-    BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
-    this.outputWriter = new PrintWriter(bufferedWriter);
+    OutputStreamWriter outputStream = new OutputStreamWriter(this.socket.getOutputStream(), StandardCharsets.UTF_8);
+    BufferedWriter bufferedOutputStream = new BufferedWriter(outputStream);
+    this.out = new PrintWriter(bufferedOutputStream);
 
-    InputStreamReader inputStreamReader = new InputStreamReader(this.socket.getInputStream());
-    this.inputReader = new BufferedReader(inputStreamReader);
+    InputStreamReader inputStream = new InputStreamReader(this.socket.getInputStream(), StandardCharsets.UTF_8);
+    this.in = new BufferedReader(inputStream);
 
     this.send(MessageFormat.format("USER {0} {0} {0} :{1}", user, gecos));
     this.send(MessageFormat.format("NICK {0}", nick));
@@ -64,8 +72,8 @@ public class IRC implements Runnable {
   */
   public void disconnect() throws IOException {
     this.shouldRun = false;
-    this.outputWriter.close();
-    this.inputReader.close();
+    this.out.close();
+    this.in.close();
     this.socket.close();
   }
 
@@ -82,7 +90,7 @@ public class IRC implements Runnable {
   private String read() {
     String message;
     try {
-      message = this.inputReader.readLine();
+      message = this.in.readLine();
     } catch (IOException exception) {
       message = null;
     }
@@ -95,9 +103,9 @@ public class IRC implements Runnable {
   * @param command The command to send.
   */
   private void send(String command) {
-    this.outputWriter.print(command);
-    this.outputWriter.print("\r\n");
-    this.outputWriter.flush();
+    this.out.print(command);
+    this.out.print("\r\n");
+    this.out.flush();
   }
 
   /**
@@ -116,15 +124,23 @@ public class IRC implements Runnable {
     return (Message) this.messages.take();
   }
 
+  /**
+  * Send a pong message to the server.
+  * @param key The key to send with the pong.
+  */
   private void pong(String key) {
     this.send(MessageFormat.format("PONG :{0}", key));
   }
 
+  /**
+  * Run the IRC client. Called as part of the Runnable interface.
+  */
   public void run() {
     while (this.shouldRun) {
       String message = this.read();
-      if (message == null)
+      if (message == null) {
         continue;
+      }
 
       if (message.indexOf("PING") == 0) {
         String key = message.split(" ")[1];
@@ -140,7 +156,7 @@ public class IRC implements Runnable {
         } catch (InterruptedException exception) {
           Log.debug("The message queue is full, dropping message");
         } catch (StringIndexOutOfBoundsException exception) {
-
+          Log.debug("Could not parse message");
         }
       }
     }

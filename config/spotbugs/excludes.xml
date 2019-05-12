@@ -7,7 +7,7 @@
 https://github.com/spotbugs/spotbugs/issues/724
  -->
   <Match>
-    <Class name="se.dequeue.waluigi.Nortic" />
+    <Class name="se.axgn.ircruskibot.Translator" />
     <Bug pattern="URLCONNECTION_SSRF_FD" />
   </Match>
   <!-- Disable check for setAccessible(true) needed to be in a doPrivileged block.

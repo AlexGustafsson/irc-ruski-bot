@@ -25,6 +25,8 @@ dependencies {
   compile 'org.apache.httpcomponents:httpclient:4.5.6'
   // Dependency for JSON
   compile 'org.json:json:20180813'
+  // Include annotations for SpotBugs
+  compileOnly 'com.github.spotbugs:spotbugs-annotations:3.1.12'
 }
 
 sourceSets {
