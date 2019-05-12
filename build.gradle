@@ -109,7 +109,7 @@ allprojects {
   }
 }
 
-mainClassName = 'se.axgn.irc_ruski_bot.App'
+mainClassName = 'se.axgn.ircruskibot.App'
 description = 'Ruski Bot v0.0.1 (github.com/AlexGustafsson/irc-ruski-bot)'
 sourceCompatibility = '1.9'
 targetCompatibility = '1.9'
