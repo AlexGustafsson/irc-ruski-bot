@@ -6,9 +6,9 @@ plugins {
   // Plugin adding syntax checking / code style checking
   id 'checkstyle'
   // Plugin to detect bug patterns
-  id 'com.github.spotbugs' version '1.6.5'
+  id 'com.github.spotbugs' version '1.7.1'
   // Plugin to check for issues with dependencies
-  id 'org.owasp.dependencycheck' version '4.0.0.1'
+  id 'org.owasp.dependencycheck' version '5.0.0-M3.1'
 }
 
 repositories {
@@ -20,7 +20,7 @@ dependencies {
   testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
   // Extension to SpotBugs to spot security bugs
-  spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.8.0'
+  spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.9.0'
 }
 
 sourceSets {
@@ -70,7 +70,7 @@ test {
 
 checkstyle {
   // Configure checkstyle to use the latest version
-	toolVersion "8.15"
+	toolVersion "8.20"
   // Configure path to checkstyle config
   configFile = project(':').file('config/checkstyle/checkstyle.xml')
   // Define variable suppressions to point to the path of the suppressions file
@@ -79,7 +79,7 @@ checkstyle {
 
 spotbugs {
   // Configure SpotBugs to use the latest version
-  toolVersion = '3.1.9'
+  toolVersion = '3.1.12'
   effort = "max"
   reportLevel = "low"
   ignoreFailures = true
