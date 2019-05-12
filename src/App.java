@@ -1,6 +1,9 @@
 package se.axgn.ircruskibot;
 
 import java.io.IOException;
+
+import java.text.MessageFormat;
+
 import java.util.Map;
 
 /**
@@ -43,11 +46,26 @@ public class App {
     Log.debug("Starting event loop");
     while (true) {
       try {
-        String message = client.retrieveMessage();
-        Log.debug("Got message: <{0}>", message);
+        Message message = client.retrieveMessage();
+        if (message.body.equals(MessageFormat.format("{0}: help", nick))) {
+          handleHelp(client, channel, nick);
+        } else if (message.body.indexOf(MessageFormat.format("{0}: ", nick)) == 0) {
+          handleTranslation(client, channel, message.body);
+        }
       } catch (InterruptedException exception) {
 
       }
     }
+  }
+
+  private static void handleHelp(IRC client, String channel, String nick) {
+    client.send(channel, "I translate your messages to Ruski. Example:");
+    client.send(channel, MessageFormat.format("{0}: I only drive Lada -> YA yezzhu tol'ko na Lade", nick));
+    client.send(channel, "You can also use the following command:");
+    client.send(channel, MessageFormat.format("{0}: help -> this help text", nick));
+  }
+
+  private static void handleTranslation(IRC client, String channel, String body) {
+    client.send(channel, body);
   }
 }

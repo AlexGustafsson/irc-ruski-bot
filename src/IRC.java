@@ -12,8 +12,9 @@ import javax.net.ssl.SSLSocketFactory;
 
 import java.text.MessageFormat;
 
-import java.util.concurrent.BlockingQueue;
+import java.util.Arrays;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 /**
 * An IRC connector.
@@ -22,7 +23,7 @@ public class IRC implements Runnable {
   SSLSocket socket;
   PrintWriter outputWriter;
   BufferedReader inputReader;
-  BlockingQueue messages = new ArrayBlockingQueue<String>(1024);
+  BlockingQueue messages = new ArrayBlockingQueue<Message>(1024);
   volatile boolean shouldRun;
 
   /**
@@ -111,8 +112,8 @@ public class IRC implements Runnable {
   /**
   * Get a queued message.
   */
-  public String retrieveMessage() throws InterruptedException {
-    return (String) this.messages.take();
+  public Message retrieveMessage() throws InterruptedException {
+    return (Message) this.messages.take();
   }
 
   private void pong(String key) {
@@ -130,9 +131,16 @@ public class IRC implements Runnable {
         this.pong(key);
       } else {
         try {
-          this.messages.put(message);
+          String[] parts = message.split(" ");
+          String sender = parts[0].split("!")[0].substring(1);
+          String messageType = parts[1];
+          String target = parts[2];
+          String body = String.join(" ", Arrays.copyOfRange(parts, 3, parts.length)).substring(1);
+          this.messages.put(new Message(sender, messageType, target, body));
         } catch (InterruptedException exception) {
           Log.debug("The message queue is full, dropping message");
+        } catch (StringIndexOutOfBoundsException exception) {
+
         }
       }
     }
