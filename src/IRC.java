@@ -11,14 +11,24 @@ import java.io.PrintWriter;
 
 import java.nio.charset.StandardCharsets;
 
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+
 import java.text.MessageFormat;
 
 import java.util.Arrays;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 /**
 * An IRC connector.
@@ -29,12 +39,14 @@ public class IRC implements Runnable {
   BufferedReader in = null;
   BlockingQueue messages = new ArrayBlockingQueue<Message>(1024);
   volatile boolean shouldRun = false;
+  boolean disableTLSValidation = false;
 
   /**
   * Instantiate an IRC client.
+  * @param disableTLSValidation Whether or not to disable the TLS validation.
   */
-  public IRC() {
-
+  public IRC(boolean disableTLSValidation) {
+    this.disableTLSValidation = disableTLSValidation;
   }
 
   /**
@@ -49,8 +61,25 @@ public class IRC implements Runnable {
       value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
       justification = "SSLSocketFactory.createSocket() never returns null."
   )
-  public void connect(String server, int port, String user, String nick, String gecos) throws IOException {
+  public void connect(String server, int port, String user, String nick, String gecos) throws IOException, NoSuchAlgorithmException, KeyManagementException {
     SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+
+    if (this.disableTLSValidation) {
+      TrustManager[] trustAllCerts = new TrustManager[] {
+        new X509TrustManager(){
+          public X509Certificate[] getAcceptedIssuers(){
+            return new X509Certificate[0];
+          }
+          public void checkClientTrusted(X509Certificate[] chain, String authType){}
+          public void checkServerTrusted(X509Certificate[] chain, String authType){}
+        }
+      };
+
+      SSLContext context = SSLContext.getInstance("TLS");
+      context.init(null, trustAllCerts, new SecureRandom());
+      factory = context.getSocketFactory();
+    }
+
     this.socket = (SSLSocket) factory.createSocket(server, port);
     this.socket.startHandshake();
 
@@ -156,7 +185,7 @@ public class IRC implements Runnable {
         } catch (InterruptedException exception) {
           Log.debug("The message queue is full, dropping message");
         } catch (StringIndexOutOfBoundsException exception) {
-          Log.debug("Could not parse message");
+          Log.debug("Could not parse message: {0}", message);
         }
       }
     }

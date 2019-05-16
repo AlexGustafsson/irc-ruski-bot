@@ -4,6 +4,9 @@ import java.io.IOException;
 
 import java.text.MessageFormat;
 
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+
 import java.util.Map;
 
 /**
@@ -25,6 +28,7 @@ public class App {
     final String user = env.getOrDefault("IRC_USER", "ruski-bot");
     final String gecos = env.getOrDefault("IRC_GECOS", "Emoji Ruski v0.0.1 (github.com/AlexGustafsson/irc-ruski-bot)");
     final String yandexTranslateKey = env.getOrDefault("YANDEX_TRANSLATE_API_KEY", null);
+    final boolean disableTLSValidation = Boolean.parseBoolean(env.getOrDefault("DISABLE_TLS_VALIDATION", "false"));
 
     if (server == null) {
       Log.error("Cannot start the bot without a given server");
@@ -36,13 +40,21 @@ public class App {
       System.exit(1);
     }
 
+    if (disableTLSValidation) {
+      Log.warn("Disabling TLS validation. You are now susceptible to MITM attacks!");
+    }
+
     translator = new Translator(yandexTranslateKey);
 
-    IRC client = new IRC();
+    IRC client = new IRC(disableTLSValidation);
     try {
       Log.debug("Connecting to {0}:{1,number,#} as {2} ({3})", server, port, user, nick);
       client.connect(server, port, user, nick, gecos);
     } catch (IOException exception) {
+      Log.error("Could not connect to the server", exception);
+    } catch (NoSuchAlgorithmException exception) {
+      Log.error("Could not connect to the server", exception);
+    } catch (KeyManagementException exception) {
       Log.error("Could not connect to the server", exception);
     }
     Log.debug("Connected");

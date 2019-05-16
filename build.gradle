@@ -120,4 +120,4 @@ description = 'Ruski Bot v0.0.1 (github.com/AlexGustafsson/irc-ruski-bot)'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 // The version is specified using the semantic versioning system
-version = '0.0.1'
+version = '0.0.3'

@@ -14,7 +14,7 @@ cd irc-ruski-bot
 # Build the image
 ./build-docker.sh
 # Start the image
-docker run -d -e IRC_SERVER='irc.example.org' YANDEX_TRANSLATE_API_KEY='api key' --restart always axgn/irc-ruski-bot
+docker run -d -e IRC_SERVER='irc.example.org' -e YANDEX_TRANSLATE_API_KEY='api key' --restart always axgn/irc-ruski-bot
 ```
 
 ### Documentation
@@ -30,6 +30,7 @@ docker run -d \
 -e IRC_USER='emoji-bot' \
 -e IRC_GECOS='Ruski Bot v0.1 (github.com/AlexGustafsson/irc-ruski-bot)' \
 -e YANDEX_TRANSLATE_API_KEY='api key' \
+-e DISABLE_TLS_VALIDATION='false' \
 axgn/irc-ruski-bot
 ```
 
