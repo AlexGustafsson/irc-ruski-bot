@@ -36,7 +36,7 @@ axgn/irc-ruski-bot
 
 The image is stateless and based on Alpine and is roughly 110MB in size. While running, the container usually uses 0.10% of the CPU and roughly 40MB of RAM. During load it uses about 15% CPU and while starting about 50% on a single core and an unchanged amout of RAM.
 
-To prevent any unforseen events, one can therefore limit the container's resources by using the flags `--cpus=0.2` (based on four CPUs) and `--memory=50MB` which should both leave some head room. Note that the lower CPU count will cause somewhat slower startups.
+To prevent any unforseen events, one can therefore limit the container's resources by using the flags `--cpus=0.2` and `--memory=50MB` which should both leave some head room. Note that the lower CPU count will cause somewhat slower startups.
 
 #### Invoking via IRC
 
