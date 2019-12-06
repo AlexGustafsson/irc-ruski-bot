@@ -6,7 +6,7 @@ plugins {
   // Plugin adding syntax checking / code style checking
   id 'checkstyle'
   // Plugin to detect bug patterns
-  id 'com.github.spotbugs' version '1.7.1'
+  id 'com.github.spotbugs' version '3.0.0'
   // Plugin to check for issues with dependencies
   id 'org.owasp.dependencycheck' version '5.0.0-M3.1'
 }
@@ -17,16 +17,16 @@ repositories {
 
 dependencies {
   // JUnit - used for unit tests
-  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
-  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
+  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0-M1'
+  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0-M1'
   // Extension to SpotBugs to spot security bugs
-  spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.9.0'
+  spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.10.1'
   // Apache URL building and more
-  compile 'org.apache.httpcomponents:httpclient:4.5.6'
+  compile 'org.apache.httpcomponents:httpclient:4.5.10'
   // Dependency for JSON
-  compile 'org.json:json:20180813'
+  compile 'org.json:json:20190722'
   // Include annotations for SpotBugs
-  compileOnly 'com.github.spotbugs:spotbugs-annotations:3.1.12'
+  compileOnly 'com.github.spotbugs:spotbugs-annotations:4.0.0-beta'
 }
 
 sourceSets {
